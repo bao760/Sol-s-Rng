@@ -30,30 +30,18 @@ welcomeMessage.Font = Enum.Font.GothamBold
 welcomeMessage.TextSize = 18
 welcomeMessage.Parent = frame
 
--- Tạo nút bật/tắt đẹp
-local function createToggleButton(text, position, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.9, 0, 0, 40)
-    button.Position = position
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.BackgroundColor3 = Color3.fromRGB(20, 20, 60)
-    button.Font = Enum.Font.GothamBold
-    button.TextSize = 18
-    button.Parent = frame
-    
-    local state = false
-    button.MouseButton1Click:Connect(function()
-        state = not state
-        if state then
-            button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-        else
-            button.BackgroundColor3 = Color3.fromRGB(20, 20, 60)
-        end
-        callback(state)
-    end)
-    return button
-end
+-- Tạo nút bật/tắt bằng hình ảnh
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Size = UDim2.new(0, 100, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -50, 1, 10)
+toggleButton.Image = "rbxassetid://17862401940" -- Thay thế bằng ID ảnh của bạn
+toggleButton.Parent = frame
+
+local isVisible = true
+toggleButton.MouseButton1Click:Connect(function()
+    isVisible = not isVisible
+    frame.Visible = isVisible
+end)
 
 -- Auto Lụm Vật Phẩm
 function AutoPickupItems(state)
@@ -70,15 +58,36 @@ function AutoPickupItems(state)
     end
 end
 
-createToggleButton("🛠️ Auto Lụm Vật Phẩm", UDim2.new(0.05, 0, 0, 100), AutoPickupItems)
-
 -- Auto Parkour
 function AutoParkour(state)
     _G.AutoParkour = state
     while _G.AutoParkour do
         wait(0.1)
         game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        wait(0.5)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Workspace.ParkourFinishPoint.CFrame
     end
 end
 
-createToggleButton("🏃 Auto Nhảy Parkour", UDim2.new(0.05, 0, 0, 160), AutoParkour)
+-- Hop Map Glitch
+function HopMapGlitch()
+    local TeleportService = game:GetService("TeleportService")
+    local PlaceID = game.PlaceId
+    local Servers = {} -- Chứa danh sách server
+    local success, data = pcall(function()
+        return game:GetService("HttpService"):JSONDecode(
+            game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceID .. "/servers/Public?sortOrder=Asc&limit=100"))
+    end)
+    
+    if success and data then
+        for _, v in pairs(data.data) do
+            if v.playing < v.maxPlayers then
+                table.insert(Servers, v.id)
+            end
+        end
+        
+        if #Servers > 0 then
+            TeleportService:TeleportToPlaceInstance(PlaceID, Servers[math.random(1, #Servers)], game.Players.LocalPlayer)
+        end
+    end
+end
