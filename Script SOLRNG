@@ -1,0 +1,84 @@
+-- Hài Roblox Sol RNG - Auto Script
+local ui = Instance.new("ScreenGui")
+ui.Name = "HàiRobloxSolRNG"
+ui.Parent = game.CoreGui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 500, 0, 350)
+frame.Position = UDim2.new(0.5, -250, 0.5, -175) -- Chỉnh vào giữa màn hình
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 30)
+frame.BorderSizePixel = 3
+frame.Parent = ui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Text = "🌟 Hài Roblox Sol RNG 🌟"
+title.TextColor3 = Color3.fromRGB(255, 215, 0)
+title.BackgroundTransparency = 0.2
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.Parent = frame
+
+-- Hiển thị thông báo khi bật script
+local welcomeMessage = Instance.new("TextLabel")
+welcomeMessage.Size = UDim2.new(1, 0, 0, 50)
+welcomeMessage.Position = UDim2.new(0, 0, 0, 50)
+welcomeMessage.Text = "📢 Xin chào! Chào mừng đến với Hài Roblox Sol's RNG!"
+welcomeMessage.TextColor3 = Color3.fromRGB(0, 255, 0)
+welcomeMessage.BackgroundTransparency = 1
+welcomeMessage.Font = Enum.Font.GothamBold
+welcomeMessage.TextSize = 18
+welcomeMessage.Parent = frame
+
+-- Tạo nút bật/tắt đẹp
+local function createToggleButton(text, position, callback)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.9, 0, 0, 40)
+    button.Position = position
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(20, 20, 60)
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 18
+    button.Parent = frame
+    
+    local state = false
+    button.MouseButton1Click:Connect(function()
+        state = not state
+        if state then
+            button.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        else
+            button.BackgroundColor3 = Color3.fromRGB(20, 20, 60)
+        end
+        callback(state)
+    end)
+    return button
+end
+
+-- Auto Lụm Vật Phẩm
+function AutoPickupItems(state)
+    _G.AutoPickup = state
+    while _G.AutoPickup do
+        wait(0.5)
+        for _, item in pairs(game.Workspace:GetChildren()) do
+            if item:IsA("Tool") then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = item.Handle.CFrame
+                wait(0.1)
+                fireclickdetector(item.Handle:FindFirstChildOfClass("ClickDetector"))
+            end
+        end
+    end
+end
+
+createToggleButton("🛠️ Auto Lụm Vật Phẩm", UDim2.new(0.05, 0, 0, 100), AutoPickupItems)
+
+-- Auto Parkour
+function AutoParkour(state)
+    _G.AutoParkour = state
+    while _G.AutoParkour do
+        wait(0.1)
+        game.Players.LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end
+
+createToggleButton("🏃 Auto Nhảy Parkour", UDim2.new(0.05, 0, 0, 160), AutoParkour)
